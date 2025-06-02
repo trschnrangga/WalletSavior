@@ -6,6 +6,7 @@ import Sidebar from '@/components/GenSidebar';
 import { useEffect } from 'react';
 import { useRouter } from 'next/router';
 import React from 'react';
+import { Toaster } from 'sonner';
 
 
 export default function MyApp({ Component, pageProps }: AppProps) {
@@ -32,9 +33,17 @@ export default function MyApp({ Component, pageProps }: AppProps) {
 
   return (
     <div className="flex">
-      {session ? <Sidebar/> : <AuthSidebar/>}
+      {session ? <Sidebar /> : <AuthSidebar />}
       <main className="flex-1 p-10 min-h-screen items-center justify-center">
         <Component {...pageProps} />
+      <Toaster position='top-right' toastOptions={{
+        style: {
+          background: 'var(--card)',
+          color: 'var(--primary)',
+          border: '1px solid var(--border)',
+          fontFamily: 'var(--font-sans)',
+        },
+      }}/>
       </main>
     </div>
   );
