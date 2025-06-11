@@ -12,7 +12,6 @@ import {
 } from "@/components/ui/card"
 import { SpendingChart } from './components/SpendingChart'
 import TopSectionCards from './components/SectionCards';
-import CategorySpentChart from './components/BudgetSpentChart';
 
 function dashboard() {
   return (
@@ -25,9 +24,6 @@ function dashboard() {
       </div>
       <div>
         <SpendingChart />
-      </div>
-      <div>
-        {/* <CategorySpentChart /> */}
       </div>
     </div>
   )

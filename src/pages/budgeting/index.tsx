@@ -8,7 +8,7 @@ import AddCategoryDialog from './dialogs/AddCategoryDialog'
 import EditCategoryDialog from './dialogs/EditCategoryDialog'
 import dummyData from '@/pages/api/dummy/budgeting'
 
-interface Category {
+export interface Category {
   id: number
   name: string
   budget: number
