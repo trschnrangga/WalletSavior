@@ -1,5 +1,6 @@
 // pages/_app.tsx
 import type { AppProps } from 'next/app';
+import type { NextPage } from 'next';
 import '@/styles/globals.css';
 import AuthSidebar from '@/components/AuthSidebar';
 import Sidebar from '@/components/GenSidebar';
@@ -8,43 +9,58 @@ import { useRouter } from 'next/router';
 import React from 'react';
 import { Toaster } from 'sonner';
 
+// Allow pages to define custom layout
+type NextPageWithLayout = NextPage & {
+  getLayout?: (page: React.ReactElement) => React.ReactNode;
+};
 
-export default function MyApp({ Component, pageProps }: AppProps) {
+type AppPropsWithLayout = AppProps & {
+  Component: NextPageWithLayout;
+};
 
-  const session = true;
+export default function MyApp({ Component, pageProps }: AppPropsWithLayout) {
+  const session = false; // Replace with real session logic
   const router = useRouter();
 
   const publicRoutes = ['/login', '/register'];
-  const protectedRoutes = ['/dashboard']; // add more as needed
+  const protectedRoutes = ['/dashboard'];
 
   useEffect(() => {
     const currentPath = router.pathname;
 
-    // Logged-in users trying to visit login/register
     if (session && publicRoutes.includes(currentPath)) {
-      router.replace('/dashboard'); // or your home page
+      router.replace('/dashboard');
     }
 
-    // Not logged-in users trying to visit protected routes
     if (!session && protectedRoutes.includes(currentPath)) {
       router.replace('/login');
     }
   }, [router.pathname, session]);
 
-  return (
+  // Use the layout defined at the page level, or fall back to default layout
+  const getLayout = Component.getLayout ?? ((page) => (
     <div className="flex">
       {session ? <Sidebar /> : <AuthSidebar />}
       <main className="flex-1 p-10 min-h-screen items-center justify-center">
-        <Component {...pageProps} />
-      <Toaster position='top-right' toastOptions={{
-        style: {
-          background: 'var(--card)',
-          color: 'var(--primary)',
-          border: '1px solid var(--border)',
-          fontFamily: 'var(--font-sans)',
-        },
-      }}/>
+        {page}
       </main>
     </div>
+  ));
+
+  return getLayout(
+    <>
+      <Component {...pageProps} />
+      <Toaster
+        position="top-right"
+        toastOptions={{
+          style: {
+            background: 'var(--card)',
+            color: 'var(--primary)',
+            border: '1px solid var(--border)',
+            fontFamily: 'var(--font-sans)',
+          },
+        }}
+      />
+    </>
   );
 }
