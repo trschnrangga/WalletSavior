@@ -53,7 +53,7 @@ export function DataTable<TData, TValue>({
       globalFilter,
     },
   })
-
+  
   return (
     <div className="rounded-md">
       <div>

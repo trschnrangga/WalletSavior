@@ -1,28 +1,49 @@
 import { Select } from '@/components/ui/select'
 import { Button } from '@/components/ui/button'
 import { Card, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
-import TransactionCard from './components/TransactionCard'
 import React, { useState, useEffect } from 'react'
 import { DataTable } from './table/data-table'
 import { Transaction, columns } from './table/columns'
-import dummyData from '@/pages/api/dummy/transactions'
+// import dummyData from '@/pages/api/dummy/transactions'
 import { Input } from '@/components/ui/input'
 import AddTransactionDialog from './dialogs/AddTransactionDialog'
+import fetchTransactions from '../api/transactions/fetchTransactions'
+import { useSession } from '../context/SessionContext'
+import { toast } from 'sonner'
+import { useRouter } from 'next/router'
 
 
 function TransactionsPage() {
   const [globalFilter, setGlobalFilter] = useState("");
-  const [transactions, setTransactions] = useState<Transaction[]>(dummyData);
+  const [transactions, setTransactions] = useState<Transaction[]>();
+  const { user } = useSession();
+  const userId = user?.id;
   
+  const router = useRouter();
+  const categoryFilter = router.query.category as string;
+
+  const getTransactions = async () =>{
+    const { data, error } = await fetchTransactions(userId);
+    if (error){
+      toast.error("Error fetching transactions" + error.message);
+    } else{
+      console.log(data)
+      setTransactions(data as Transaction[])
+    }
+  }
+
   useEffect(() => {
-      // async function fetchCategories() {
-      // const res = await fetch('/api/categories');
-      // const data = await res.json();
-      // setCategories(data);
-      
+    if (categoryFilter){
+      setGlobalFilter(categoryFilter);
+    }
+  }, [categoryFilter])
+
+  useEffect(() => {
+    if (userId){
+      getTransactions();
+    }
       //dummy json from dummy/budgeting
-      setTransactions(dummyData)
-    }, [])
+    }, [userId])
 
   return (
     <div>
@@ -41,22 +62,13 @@ function TransactionsPage() {
             />
           </div>
           <div className="flex justify-end">
-            <AddTransactionDialog onAdd={(id :number, name: string, description: string, date: Date, category: string, amount: number) => {
-            const newTransaction: Transaction = {
-              id,
-              name,
-              description,
-              date,
-              category,
-              amount
-            };
-            setTransactions(prev => [...prev, newTransaction]);
-          }}
-              />
+            <AddTransactionDialog 
+            onAdd={(newTransaction) => setTransactions((prev) => [ ...(prev ?? []), newTransaction ])}
+             />
           </div>
       </div>
       <div className='pt-5'>
-        <DataTable columns={columns} data={transactions} globalFilter={globalFilter} setGlobalFilter={setGlobalFilter} />
+        <DataTable columns={columns} data={transactions || []} globalFilter={globalFilter} setGlobalFilter={setGlobalFilter} />
       </div>
       </div>
     </div>

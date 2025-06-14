@@ -12,7 +12,7 @@ import { useSession } from '@/pages/context/SessionContext'
 import { toast } from 'sonner'
 import deleteCategories from '../api/budgeting/deleteCategories'
 import editCategory from '../api/budgeting/EditCategories'
-// import dummyData from '@/pages/api/dummy/budgeting'
+import { useRouter } from 'next/router'
 
 export interface Category {
   id: number,
@@ -26,7 +26,9 @@ function BudgetingPage() {
   const [categories, setCategories] = useState<Category[]>([])
   const [editDialogOpen, setEditDialogOpen] = useState(false)
   const [selectedCategory, setSelectedCategory] = useState<Category | null>(null)
-
+  
+  const router = useRouter();
+  
   const { user } = useSession();
   const userId = user?.id
 
@@ -80,19 +82,18 @@ function BudgetingPage() {
     // }
   }
 
+  async function getCategories() {
+    const { data, error } = await fetchCategories(userId);
+    if (error){
+      toast.error("Error fetching categories: " + error.message)
+    }
+    setCategories(data as Category[])  
+    // Optionally handle error
+  }
   
 
   useEffect(() => {
-    async function getCategories() {
-      const { data, error } = await fetchCategories(userId);
-      if (error){
-        toast.error("Error fetching categories: " + error.message)
-      }
-      setCategories(data as Category[])
-      // Optionally handle error
-      
-    }
-
+    
     // getCategories();
     if (userId) {
       getCategories();
@@ -132,7 +133,10 @@ function BudgetingPage() {
                       </div>
                     </div>
                     <Progress value={percent}></Progress>
-                    <Button className='hover:bg-white/5 hover:text-foreground hover:border-1 hover:border-white/15'>
+                    <Button 
+                      className='hover:bg-white/5 hover:text-foreground hover:border-1 hover:border-white/15'
+                      onClick={() => router.push(`/transactions?category=${encodeURIComponent(category.name)}`)}
+                      >
                       View Details
                     </Button>
                   </div>

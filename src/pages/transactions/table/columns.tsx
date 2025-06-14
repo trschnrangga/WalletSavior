@@ -10,7 +10,8 @@ export type Transaction = {
     name: string
     description: string
     date: Date
-    category: string
+    cat_id: number
+    cat_name: string
     amount: number
 }
 
@@ -47,8 +48,8 @@ export const columns: ColumnDef<Transaction>[] = [
         }
     },
     {
-        accessorKey: 'category',
-        header: 'Category',
+        accessorKey: 'cat_name',
+        header: 'Category'
     },
     {
         accessorKey: 'amount',

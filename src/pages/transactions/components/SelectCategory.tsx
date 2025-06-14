@@ -10,21 +10,27 @@ import React from 'react'
 
 interface SelectCategoryProps {
     categories: Category[],
-    onSelect: (id: number) => void
+    onSelect: (cat: Category) => void
 }
 
 function SelectCategory({categories, onSelect}: SelectCategoryProps ) {
+  const handleSelect = (value: string) => {
+    const selectedCategory = categories.find(cat => cat.id.toString() === value);
+    if (selectedCategory) {
+      onSelect(selectedCategory);
+    }
+  }
   return (
     <div>
-        <Select onValueChange={(value) => onSelect(Number(value))}>
+        <Select onValueChange={handleSelect}>
         <SelectTrigger className="w-[180px]">
             <SelectValue placeholder="Category" />
         </SelectTrigger>
         <SelectContent className="border-border">
             {
               categories.map(category => (
-                <SelectItem key={category.id} value={category.id.toString()} onClick={() => onSelect(category.id)}>
-                  {category.name}   
+                <SelectItem key={category.id} value={category.id.toString()}>
+                  {category.name}
                 </SelectItem>
               ))
             }
