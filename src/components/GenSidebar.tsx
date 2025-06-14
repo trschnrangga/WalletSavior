@@ -4,6 +4,9 @@ import { useRouter } from 'next/router';
 import { cn } from '@/lib/utils';
 import { Label } from '@/components/ui/label'
 import Image from 'next/image';
+import { Button } from './ui/button';
+import { supabase } from '@/pages/api/supabaseClient';
+import { toast } from 'sonner';
 
 const links = [
   { href: '/dashboard', label: 'Dashboard' },
@@ -13,6 +16,16 @@ const links = [
 
 export default function GenSidebar() {
   const router = useRouter();
+
+  const handleSignout = async () => {
+    const {error} = await supabase.auth.signOut();
+    if (error) {
+      toast.error(`Sign out error: ${error.message}`);
+    } else {
+      router.replace('/login');
+      toast.success('Successfully signed out');
+    }
+  };
 
   return (
     <aside className="w-64 border-r h-screen px-4 py-6 border-border sticky top-0">
@@ -36,7 +49,12 @@ export default function GenSidebar() {
             {link.label}
           </Link>
         ))}
-      </nav>
+      </nav>  
+      <div>
+        <Button variant="ghost" className="mt-10 w-full justify-start hover:te text-gray-600 hover:bg-gray-600/10" onClick={() => {handleSignout()}}>
+          Logout
+        </Button>
+      </div>
     </aside>
   );
 }

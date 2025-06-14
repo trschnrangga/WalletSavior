@@ -24,10 +24,11 @@ const HomePage = () => {
         <Image
           src='/dashboardpic.png'
           alt="WalletSavior Logo"
-          width={1280}
+          width={1000}
           height={720}
           quality={100}
-          className="rounded-3xl shadow-primary self-center mt-20"
+          priority={true}
+          className="rounded-3xl shadow-primary self-center mt-20 w-auto h-auto"
           />
         </div>
         <div className='flex h-full justify-center item'>

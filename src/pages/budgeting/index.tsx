@@ -6,12 +6,18 @@ import { Button } from '@/components/ui/button'
 import { Progress } from '@/components/ui/progress'
 import AddCategoryDialog from './dialogs/AddCategoryDialog'
 import EditCategoryDialog from './dialogs/EditCategoryDialog'
-import dummyData from '@/pages/api/dummy/budgeting'
+import fetchCategories from '../api/budgeting/fetchCategories'
+import { supabase } from '../api/supabaseClient'
+import { useSession } from '@/pages/context/SessionContext'
+import { toast } from 'sonner'
+import deleteCategories from '../api/budgeting/deleteCategories'
+import editCategory from '../api/budgeting/EditCategories'
+// import dummyData from '@/pages/api/dummy/budgeting'
 
 export interface Category {
-  id: number
-  name: string
-  budget: number
+  id: number,
+  name: string,
+  budget: number,
   remaining: number
 }
 
@@ -21,16 +27,18 @@ function BudgetingPage() {
   const [editDialogOpen, setEditDialogOpen] = useState(false)
   const [selectedCategory, setSelectedCategory] = useState<Category | null>(null)
 
+  const { user } = useSession();
+  const userId = user?.id
 
   const DeleteCategory = async (catId: number) => {
-    // try {
-    // const res = await fetch(`/api/categories/${catId}`, {
-    //   method: 'DELETE',
-    // });
+    
+    const { error } = await deleteCategories(catId);
+    if (error){
+      toast.error("Error deleting category: " + error.message);
+    }else {
+      toast.success("Sucessfully deleted category");
+    }
 
-    // if (!res.ok) throw new Error('Failed to delete');
-
-    // Update state if backend deletion succeeded
     setCategories(prev => prev.filter(category => category.id !== catId));
     // } catch (error) {
     //   console.error(error);
@@ -47,24 +55,20 @@ function BudgetingPage() {
   }
 
   const handleSaveCategory = async (id: number, name: string, budget: number) => {
-  //  try {
-    // const res = await fetch(`/api/categories/${id}`, {
-    //   method: 'PUT',
-    //   headers: {
-    //     'Content-Type': 'application/json',
-    //   },
-    //   body: JSON.stringify({ name, budget }),
-    // });
 
-    // if (!res.ok) throw new Error('Failed to update category');
-
-    // You can optionally get the updated category data:
-    // const updated = await res.json();
+    const { error } = await editCategory(id, name, budget);
+    if (error){
+      toast.error("Failed to edit category: " + error.message)
+    } else{
+      toast.success("Sucessfully edited category!")
+    }
 
     // Update UI
     setCategories(prev =>
       prev.map(cat =>
-        cat.id === id ? { ...cat, name, budget, remaining: budget } : cat
+        cat.id === id
+          ? { ...cat, name, budget: budget, remaining: budget }
+          : cat
       )
     );
     setEditDialogOpen(false);
@@ -76,30 +80,30 @@ function BudgetingPage() {
     // }
   }
 
+  
+
   useEffect(() => {
-    // async function fetchCategories() {
-    // const res = await fetch('/api/categories');
-    // const data = await res.json();
-    // setCategories(data);
-    
-    //dummy json from dummy/budgeting
-    setCategories(dummyData)
-  }, [])
+    async function getCategories() {
+      const { data, error } = await fetchCategories(userId);
+      if (error){
+        toast.error("Error fetching categories: " + error.message)
+      }
+      setCategories(data as Category[])
+      // Optionally handle error
+      
+    }
+
+    // getCategories();
+    if (userId) {
+      getCategories();
+    }
+  }, [userId])
 
   return (
     <div>
       <div className='w-full flex-1 sticky bg-background p-5 top-0 z-10'>
         <h1 className='text-center text-2xl mb-5'>Categories</h1>
-        <AddCategoryDialog onAdd={(name: string, budget: number) => {
-          const newCategory = {
-            id: Date.now(),
-            name,
-            budget,
-            remaining: budget 
-          }
-          //Nambahin category ini nanti harusnya ke database juga
-          setCategories(prev => [...prev, newCategory])
-        }} />
+        <AddCategoryDialog onAdd={(newCategory) => setCategories((prev) => [...prev, newCategory])}/>
       </div>
       <div className='grid w-fit justify-self-center md:grid-cols-1 lg:grid-cols-3 justify-items-center'>
         {categories.map((category) => {

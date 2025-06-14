@@ -12,19 +12,36 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Button } from '@/components/ui/button'
 import { toast } from 'sonner'
+import { supabase } from '@/pages/api/supabaseClient'
+import { useSession } from '@/pages/context/SessionContext'
+import addCategories from '@/pages/api/budgeting/addCategories'
+import { Category } from '..'
 
-function AddCategoryDialog({ onAdd }: { onAdd: (name: string, budget: number) => void }) {
+interface AddCategoryDialogProps {
+  onAdd: (category: Category) => void;
+}
+
+function AddCategoryDialog({ onAdd }: AddCategoryDialogProps) {
   const [name, setName] = useState('')
   const [budget, setBudget] = useState('')
   const [open, setOpen] = useState(false)
+  
+  const { user } = useSession();
+  const userId = user?.id
 
-  const handleSubmit = () => {
-    if (!name || !budget) return
-    onAdd(name, parseInt(budget))
-    toast.success('Category added successfully')
-    setName('')
-    setBudget('')
-    setOpen(false)
+  const handleSubmit = async () => {
+    
+    const { data, error } = await addCategories(userId, name, budget);
+    
+    if (error) {
+      toast.error('Failed to add category: ' + error.message)
+    } else {
+      toast.success('Category added successfully')
+      onAdd(data)
+      setName('')
+      setBudget('')
+      setOpen(false)
+    }
   }
 
   return (
@@ -47,7 +64,7 @@ function AddCategoryDialog({ onAdd }: { onAdd: (name: string, budget: number) =>
               id="budget"
               type="number"
               value={budget}
-              onChange={(e) => setBudget(e.target.value)}
+              onChange={(e) => setBudget((e.target.value))}
             />
           </div>
           <Button onClick={handleSubmit} className="w-full">
