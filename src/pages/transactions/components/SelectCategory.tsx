@@ -30,7 +30,7 @@ function SelectCategory({categories, onSelect}: SelectCategoryProps ) {
         </SelectTrigger>
         <SelectContent className="border-border">
             {
-              categories.map(category => (
+              categories?.map(category => (
                 <SelectItem key={category.id} value={category.id.toString()}>
                   {category.name}
                 </SelectItem>
