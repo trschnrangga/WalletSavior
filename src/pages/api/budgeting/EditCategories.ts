@@ -1,4 +1,4 @@
-import React from 'react'
+
 import { supabase } from '../supabaseClient'
 
 async function editCategory(catId: number, name: string, budget: number) {

@@ -10,17 +10,9 @@ import {
 } from "@/components/ui/chart"
 import { Bar, BarChart, CartesianGrid, XAxis, YAxis } from "recharts"
 import fetchSpentBudgetData from '@/pages/api/dashboard/fetchSpentBudgetingData'
-import { toast } from 'sonner'
 import { Skeleton } from '@/components/ui/skeleton'
 import { useSession } from '@/pages/context/SessionContext'
 
-const chartData = [
-  { month: "Entertainment", spent: 186, budget: 200 },
-  { month: "Food", spent: 305, budget: 350 },
-  { month: "Health", spent: 237, budget: 300 },
-  { month: "Rent", spent: 100, budget: 180 },
-  { month: "Transport", spent: 214, budget: 320 },
-]
 const chartConfig = {
   spent: {
     label: "Spent",
@@ -32,11 +24,6 @@ const chartConfig = {
     color: "var(--secondary)",
   }
 } satisfies ChartConfig
-
-
-interface Props {
-  userId: string
-}
 
 interface ChartData {
   name: string,

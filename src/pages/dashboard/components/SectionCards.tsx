@@ -12,11 +12,6 @@ import { toast } from 'sonner'
 import fetchTopSectionData from "@/pages/api/dashboard/fetchTopSectionData"
 import { Skeleton } from "@/components/ui/skeleton"
 
-interface topSectionData {
-  total: number,
-  count: number,
-}
-
 export function TopSectionCard() {
   const [totalExpense, setTotalExpense] = useState<string>('');
   const [transactionsCount, setTransactionsCount] = useState<string>('')

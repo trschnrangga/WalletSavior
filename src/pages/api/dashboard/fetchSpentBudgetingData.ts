@@ -1,4 +1,4 @@
-import React from 'react'
+
 import { supabase } from '../supabaseClient'
 
 async function fetchSpentBudgetData(userId: string) {

@@ -1,6 +1,6 @@
+/* eslint-disable  @typescript-eslint/no-explicit-any */
 import HomeNav from '@/components/HomeNav';
 import Image from 'next/image';
-import Link from 'next/link';
 import React from 'react';
 import { Meteors } from '@/components/magicui/meteors'
 

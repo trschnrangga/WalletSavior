@@ -1,4 +1,4 @@
-// context/SessionContext.tsx
+/* eslint-disable  @typescript-eslint/no-explicit-any */
 'use client';
 
 import React, { createContext, useContext, useEffect, useState } from 'react';
