@@ -12,19 +12,63 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Button } from '@/components/ui/button'
 import { toast } from 'sonner'
+import { useSession } from '@/pages/context/SessionContext'
+import addCategories from '@/pages/api/budgeting/addCategories'
+import { Category } from '..'
 
-function AddCategoryDialog({ onAdd }: { onAdd: (name: string, budget: number) => void }) {
+interface AddCategoryDialogProps {
+  onAdd: (category: Category) => void;
+}
+
+function AddCategoryDialog({ onAdd }: AddCategoryDialogProps) {
   const [name, setName] = useState('')
   const [budget, setBudget] = useState('')
   const [open, setOpen] = useState(false)
+  
+  const { user } = useSession();
+  const userId = user?.id
 
-  const handleSubmit = () => {
-    if (!name || !budget) return
-    onAdd(name, parseInt(budget))
-    toast.success('Category added successfully')
-    setName('')
-    setBudget('')
-    setOpen(false)
+  function isCorrectInput():boolean {
+    if (!name){
+      toast.error("Name must be filled!");
+      return false;
+    }
+
+    if (name.length > 30){
+      toast.error("Name length can't be more than 30 characters!");
+      return false;
+    }
+
+    if (!budget){
+      toast.error("Budget cannot be empty!");
+      return false;
+    }
+
+    if (parseInt(budget) <= 0){
+      toast.error("Budget cannot be less than or equal to zero!");
+      return false;
+    }
+
+    return true;
+  }
+
+  const handleSubmit = async () => {
+    
+    if (!isCorrectInput()){
+      return
+    }
+
+    const { data, error } = await addCategories(userId, name, budget);
+    
+    if (error) {
+      toast.error('Failed to add category: ' + error.message)
+    } else {
+      toast.success('Category added successfully')
+      onAdd(data)
+      setName('')
+      setBudget('')
+      setOpen(false)
+    }
   }
 
   return (
@@ -47,7 +91,7 @@ function AddCategoryDialog({ onAdd }: { onAdd: (name: string, budget: number) =>
               id="budget"
               type="number"
               value={budget}
-              onChange={(e) => setBudget(e.target.value)}
+              onChange={(e) => setBudget((e.target.value))}
             />
           </div>
           <Button onClick={handleSubmit} className="w-full">

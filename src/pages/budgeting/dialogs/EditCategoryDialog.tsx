@@ -1,9 +1,8 @@
 'use client'
-import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog'
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { Label } from '@/components/ui/label'
-import { toast } from 'sonner'
 import { useState, useEffect } from 'react'
 
 interface Props {
@@ -33,8 +32,9 @@ export default function EditCategoryDialog({ open, onClose, category, onSave }: 
   return (
     <Dialog open={open} onOpenChange={onClose}>
       <DialogContent>
-        <DialogHeader>
+        <DialogHeader className='mb-2'>
           <DialogTitle>Edit Category</DialogTitle>
+          <DialogDescription>Note that editing a category will change the used categories in transactions accordingly.</DialogDescription>
         </DialogHeader>
         <div className="space-y-4">
           <div className='space-y-2'>
@@ -51,7 +51,7 @@ export default function EditCategoryDialog({ open, onClose, category, onSave }: 
           </div>
         </div>
         <DialogFooter>
-          <Button onClick={() => {onSave(category.id, name, budget), toast.success('Category edited successfully')}}>Save</Button>
+          <Button onClick={() => {onSave(category.id, name, budget)}}>Save</Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>

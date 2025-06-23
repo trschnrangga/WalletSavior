@@ -1,16 +1,15 @@
 "use client"
-
-import React from "react"
+import { Skeleton } from "@/components/ui/skeleton"
+import React, { useEffect } from "react"
 import {
   ColumnDef,
-  ColumnFiltersState,
   flexRender,
   getCoreRowModel,
   getFilteredRowModel,
   useReactTable,
   getPaginationRowModel,
   SortingState,
-  getSortedRowModel
+  getSortedRowModel,
 } from "@tanstack/react-table"
 import {
   Table,
@@ -22,12 +21,15 @@ import {
 } from "@/components/ui/table"
 
 import { Button } from "@/components/ui/button"
+import { Transaction } from "./columns"
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[]
   data: TData[]
   globalFilter?: string
   setGlobalFilter?: (value: string) => void
+  onSelectionChange?: (ids: number[]) => void
+  resetSelectionTrigger?: any
 }
 
 export function DataTable<TData, TValue>({
@@ -35,12 +37,16 @@ export function DataTable<TData, TValue>({
   data,
   globalFilter,
   setGlobalFilter,
+  onSelectionChange,
+  resetSelectionTrigger
 }: DataTableProps<TData, TValue>) {
   const [sorting, setSorting] = React.useState<SortingState>([])
+  const [rowSelection, setRowSelection] = React.useState({})
   // const [globalFilter, setGlobalFilter] = React.useState<any>([])
   const table = useReactTable({
     data,
     columns,
+    
     getCoreRowModel: getCoreRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
     onSortingChange: setSorting,
@@ -48,11 +54,27 @@ export function DataTable<TData, TValue>({
     getFilteredRowModel: getFilteredRowModel(),
     getSortedRowModel: getSortedRowModel(),
     globalFilterFn: "includesString",
+    onRowSelectionChange: setRowSelection,
     state: {
       sorting,
       globalFilter,
+      rowSelection,
     },
   })
+  
+  useEffect(() => {
+  if (resetSelectionTrigger !== undefined) {
+    table.resetRowSelection(true)
+  }
+}, [resetSelectionTrigger])
+
+  useEffect(() => {
+     const selectedIds = table.getSelectedRowModel().rows.map(
+    (row) => (row.original as Transaction).id
+    )
+    onSelectionChange?.(selectedIds)
+
+  },[rowSelection])
 
   return (
     <div className="rounded-md">
@@ -92,11 +114,13 @@ export function DataTable<TData, TValue>({
               </TableRow>
             ))
           ) : (
+            <div>
             <TableRow>
               <TableCell colSpan={columns.length} className="h-24 text-center">
-                No results.
+                <Skeleton  className="w-full h-full"/>
               </TableCell>
             </TableRow>
+            </div>
           )}
         </TableBody>
       </Table>
