@@ -1,6 +1,4 @@
-import { Select } from '@/components/ui/select'
 import { Button } from '@/components/ui/button'
-import { Card, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
 import React, { useState, useEffect } from 'react'
 import { DataTable } from './table/data-table'
 import { Transaction, columns } from './table/columns'
@@ -10,18 +8,22 @@ import AddTransactionDialog from './dialogs/AddTransactionDialog'
 import fetchTransactions from '../api/transactions/fetchTransactions'
 import { useSession } from '../context/SessionContext'
 import { toast } from 'sonner'
-import { useRouter } from 'next/router'
+import { useSearchParams } from 'next/navigation'
+import deleteTransactions from '../api/transactions/deleteTransactions'
 
 
 function TransactionsPage() {
   const [globalFilter, setGlobalFilter] = useState("");
   const [transactions, setTransactions] = useState<Transaction[]>();
+  const [selectedIds, setSelectedIds] = useState<number[]>()
+  const [resetSelectionTrigger, setResetSelectionTrigger] = useState(0)
   const { user } = useSession();
   const userId = user?.id;
   
-  const router = useRouter();
-  const categoryFilter = router.query.category as string;
-
+  const searchParams = useSearchParams()
+  const categoryFilter = searchParams.get('category')
+  
+  
   const getTransactions = async () =>{
     const { data, error } = await fetchTransactions(userId);
     if (error){
@@ -31,7 +33,30 @@ function TransactionsPage() {
       setTransactions(data as Transaction[])
     }
   }
+  
+  async function handleDelete(){
+    if (selectedIds){
+      const {data, error} = await deleteTransactions(selectedIds);
 
+      if (error){
+        toast.error("Failed deleting transaction/s: " + error);
+      } else{
+        toast.success("Successfully deleted transaction/s!");
+        console.log(data)
+        setTransactions((prev) => 
+        (prev ?? []).filter((transaction) => !selectedIds.includes(transaction.id))
+        );
+
+        setSelectedIds([])
+        setResetSelectionTrigger(Date.now())
+      }
+    }
+  }
+
+  useEffect(() => {
+    console.log(selectedIds)
+  },[selectedIds])
+  
   useEffect(() => {
     if (categoryFilter){
       setGlobalFilter(categoryFilter);
@@ -61,14 +86,28 @@ function TransactionsPage() {
               className="px-4 py-2 rounded-full w-full max-w-md border border-border bg-card focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent text-card-foreground"
             />
           </div>
-          <div className="flex justify-end">
+          <div className="flex">
             <AddTransactionDialog 
             onAdd={(newTransaction) => setTransactions((prev) => [ ...(prev ?? []), newTransaction ])}
              />
           </div>
+             <Button 
+             variant={'outline'} 
+             disabled={selectedIds?.length == 0}
+             className='text-red-500'
+             onClick={() => handleDelete()}
+             >
+              Delete
+             </Button>
       </div>
       <div className='pt-5'>
-        <DataTable columns={columns} data={transactions || []} globalFilter={globalFilter} setGlobalFilter={setGlobalFilter} />
+        <DataTable columns={columns} 
+        data={transactions || []} 
+        globalFilter={globalFilter} 
+        setGlobalFilter={setGlobalFilter} 
+        onSelectionChange={setSelectedIds}
+        resetSelectionTrigger={resetSelectionTrigger}
+        />
       </div>
       </div>
     </div>

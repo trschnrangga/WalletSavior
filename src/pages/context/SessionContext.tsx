@@ -9,12 +9,14 @@ export const SessionContext = createContext<any>(null);
 export const SessionProvider = ({ children }: { children: React.ReactNode }) => {
   const [session, setSession] = useState<any>(null);
   const [user, setUser] = useState<any>(null);
+  const [isSessionLoading, setIsSessionLoading] = useState<boolean>(true)
 
   useEffect(() => {
     const getInitialSession = async () => {
       const { data } = await supabase.auth.getSession();
       setSession(data.session);
       setUser(data.session?.user || null);
+      setIsSessionLoading(false);
     };
 
     getInitialSession();
@@ -22,6 +24,7 @@ export const SessionProvider = ({ children }: { children: React.ReactNode }) => 
     const { data: listener } = supabase.auth.onAuthStateChange((_event, newSession) => {
       setSession(newSession);
       setUser(newSession?.user || null);
+      setIsSessionLoading(false);
     });
 
     return () => {
@@ -30,7 +33,7 @@ export const SessionProvider = ({ children }: { children: React.ReactNode }) => 
   }, []);
 
   return (
-    <SessionContext.Provider value={{ session, user }}>
+    <SessionContext.Provider value={{ session, user, isSessionLoading }}>
       {children}
     </SessionContext.Provider>
   );

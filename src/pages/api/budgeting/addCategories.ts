@@ -1,5 +1,5 @@
 import React from 'react'
-import { supabase } from '../supabaseClient'
+import { supabase } from '../supabaseClient'  
 
 async function addCategories(userId: string, name: string, budget: string) {
 

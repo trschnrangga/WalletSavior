@@ -38,7 +38,7 @@ const HomePage = () => {
   );
 };
 
-// 🧠 This disables the default layout (sidebar)
+//This disables the default layout (sidebar)
 HomePage.getLayout = (page: any) => page;
 
 export default HomePage;

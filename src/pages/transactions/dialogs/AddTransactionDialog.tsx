@@ -1,6 +1,5 @@
 'use client'
 // import dummyTransaction from '@/pages/api/dummy/transactions'
-import dummyCategories from '@/pages/api/dummy/budgeting'
 import React, { useState, useEffect } from 'react'
 import {
   Dialog,
@@ -16,11 +15,11 @@ import { toast } from 'sonner'
 import { CalendarTransaction } from '../components/CalendarTransaction'
 import SelectCategory from '../components/SelectCategory'
 import { Transaction } from '../table/columns'
-import addCategories from '@/pages/api/budgeting/addCategories'
 import { useSession } from '@/pages/context/SessionContext'
 import addTransactions from '@/pages/api/transactions/addTransactions'
 import fetchCategories from '@/pages/api/budgeting/fetchCategories'
 import { Category } from '@/pages/budgeting'
+import { DialogDescription } from '@radix-ui/react-dialog'
 
 interface AddTransactionsProps {
   onAdd: (transaction: Transaction) => void;
@@ -48,7 +47,10 @@ function AddTransactionDialog({ onAdd }: AddTransactionsProps) {
       toast.error("Error adding transaction: " + error.message);
     } else{
       toast.success("Sucessfully added transaction!");
-      onAdd(data);
+      onAdd({
+      ...data,
+      cat_name: category.name,
+      });
       setName('')
       setDescription('')
       setDate(new Date())
@@ -79,12 +81,15 @@ function AddTransactionDialog({ onAdd }: AddTransactionsProps) {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button variant="outline" className="ml-auto mb-4">+ Add Category</Button>
+        <Button variant="outline" className="ml-auto mb-4">+ Add Transaction</Button>
       </DialogTrigger>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Add a New Transaction</DialogTitle>
+          <DialogTitle>New Transaction</DialogTitle>
         </DialogHeader>
+        <DialogDescription className='text-muted-foreground'>
+          Add a new transaction by filling in the fields
+        </DialogDescription>
         <div className="space-y-4">
           <div className='space-y-2'>
             <Label htmlFor="name">Transaction Name</Label>

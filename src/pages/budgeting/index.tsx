@@ -7,12 +7,12 @@ import { Progress } from '@/components/ui/progress'
 import AddCategoryDialog from './dialogs/AddCategoryDialog'
 import EditCategoryDialog from './dialogs/EditCategoryDialog'
 import fetchCategories from '../api/budgeting/fetchCategories'
-import { supabase } from '../api/supabaseClient'
 import { useSession } from '@/pages/context/SessionContext'
 import { toast } from 'sonner'
-import deleteCategories from '../api/budgeting/deleteCategories'
 import editCategory from '../api/budgeting/EditCategories'
-import { useRouter } from 'next/router'
+import { useRouter } from 'next/navigation'
+import DeleteConfirmCategory from './dialogs/DeleteConfirmCategory'
+import { motion } from "motion/react"
 
 export interface Category {
   id: number,
@@ -32,21 +32,6 @@ function BudgetingPage() {
   const { user } = useSession();
   const userId = user?.id
 
-  const DeleteCategory = async (catId: number) => {
-    
-    const { error } = await deleteCategories(catId);
-    if (error){
-      toast.error("Error deleting category: " + error.message);
-    }else {
-      toast.success("Sucessfully deleted category");
-    }
-
-    setCategories(prev => prev.filter(category => category.id !== catId));
-    // } catch (error) {
-    //   console.error(error);
-    //   alert('Failed to delete category');
-    // }
-  }
 
   const EditCategory = (catId: number) => {
     const category = categories.find(cat => cat.id === catId)
@@ -63,16 +48,17 @@ function BudgetingPage() {
       toast.error("Failed to edit category: " + error.message)
     } else{
       toast.success("Sucessfully edited category!")
+      router.refresh()
     }
 
     // Update UI
-    setCategories(prev =>
-      prev.map(cat =>
-        cat.id === id
-          ? { ...cat, name, budget: budget, remaining: budget }
-          : cat
-      )
-    );
+    // setCategories(prev =>
+    //   prev.map(cat =>
+    //     cat.id === id
+    //       ? { ...cat, name, budget: budget, remaining: budget }
+    //       : cat
+    //   )
+    // );
     setEditDialogOpen(false);
     setSelectedCategory(null);
 
@@ -87,7 +73,7 @@ function BudgetingPage() {
     if (error){
       toast.error("Error fetching categories: " + error.message)
     }
-    setCategories(data as Category[])  
+    setCategories(data as Category[])
     // Optionally handle error
   }
   
@@ -111,10 +97,19 @@ function BudgetingPage() {
           const percent = category.budget === 0 ? 0 : Math.min((category.remaining / category.budget) * 100, 100)
 
           return (
-            <div key={category.id} className='p-5'>
+            <motion.div 
+            key={category.id} 
+            className='p-5'
+              initial={{ opacity: 0, scale: 0 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{
+                duration: 0.1,
+                scale: { type: "spring", visualDuration: 0.4, bounce: 0.1 },
+            }}
+            >
               <Card className="w-85 max-w-md bg-card rounded-2xl text-center text-card-foreground border-border">
                 <div className='px-12 pt-5'>
-                  <CardTitle className="w-fit mx-auto text-2xl font-semibold mb-6 border-b border-border">
+                  <CardTitle className="w-full overflow-ellipsis mx-auto text-2xl font-semibold mb-6 border-b border-border">
                     {category.name}
                   </CardTitle>
                   <div className="space-y-10">
@@ -143,10 +138,11 @@ function BudgetingPage() {
                 </div>
                 <div className='w-full flex justify-between mt-3 px-2 translate-y-2'>
                   <Button onClick={() => EditCategory(category.id)} variant={'link'} className='text-gray-100/80'>Edit</Button>
-                  <Button onClick={() => DeleteCategory(category.id)} variant={'link'} className='text-red-500/80'>Delete</Button>
+                  <DeleteConfirmCategory categoryId={category.id} onDelete={() => setCategories(prev => prev.filter(cat => cat.id !== category.id))}/>
+
                 </div>
               </Card>
-            </div>
+            </motion.div>
           )
         })}
         {selectedCategory && (

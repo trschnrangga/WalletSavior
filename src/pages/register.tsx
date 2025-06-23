@@ -28,7 +28,9 @@ function RegisterPage() {
       } else{
         toast.success('Registration successful! Please check your email for confirmation.');
         // Optionally redirect or show a success message
-        router.push('/login'); // Redirect to login page after successful registration
+        router.push('/login');
+        setEmail('');
+        setPassword('');
       }
   }
 

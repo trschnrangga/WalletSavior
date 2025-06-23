@@ -19,12 +19,14 @@ type AppPropsWithLayout = AppProps & {
 
 function AppLayout({ Component, pageProps }: AppPropsWithLayout) {
   const router = useRouter();
-  const { session } = useContext(SessionContext); // Use context instead of supabase directly
+  const { session, isSessionLoading } = useContext(SessionContext); // Use context instead of supabase directly
 
   const publicRoutes = ['/login', '/register'];
-  const protectedRoutes = ['/dashboard'];
+  const protectedRoutes = ['/dashboard', '/transactions', '/budgeting'];
 
   useEffect(() => {
+    if (isSessionLoading) return
+
     const currentPath = router.pathname;
 
     if (session && publicRoutes.includes(currentPath)) {
@@ -34,7 +36,7 @@ function AppLayout({ Component, pageProps }: AppPropsWithLayout) {
     if (!session && protectedRoutes.includes(currentPath)) {
       router.replace('/login');
     }
-  }, [router.pathname, session]);
+  }, [router.pathname, session, isSessionLoading]);
 
   const getLayout = Component.getLayout ?? ((page) => (
     <div className="flex">
@@ -53,11 +55,11 @@ export default function MyApp(props: AppPropsWithLayout) {
     <SessionProvider>
       <AppLayout {...props} />
       <Toaster
+        richColors
         position="top-right"
         toastOptions={{
           style: {
             background: 'var(--card)',
-            color: 'var(--primary)',
             border: '1px solid var(--border)',
             fontFamily: 'var(--font-sans)',
           },

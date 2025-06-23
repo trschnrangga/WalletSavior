@@ -14,11 +14,13 @@ interface SelectCategoryProps {
 }
 
 function SelectCategory({categories, onSelect}: SelectCategoryProps ) {
+
   const handleSelect = (value: string) => {
     const selectedCategory = categories.find(cat => cat.id.toString() === value);
     if (selectedCategory) {
       onSelect(selectedCategory);
     }
+    
   }
   return (
     <div>

@@ -1,7 +1,7 @@
 'use client'
 import * as React from "react"
 import { Area, AreaChart, CartesianGrid, XAxis } from "recharts"
-import chartData from "@/pages/api/dummy/chartdata"
+// import chartData from "@/pages/api/dummy/chartdata"
 import {
   Card,
   CardAction,
@@ -27,6 +27,10 @@ import {
   ToggleGroup,
   ToggleGroupItem,
 } from "@/components/ui/toggle-group"
+import { useSession } from "@/pages/context/SessionContext"
+import fetchSpendingData from "@/pages/api/dashboard/fetchSpendingData"
+import { toast } from "sonner"
+import { Skeleton } from "@/components/ui/skeleton"
 
 export const description = "An interactive area chart"
 
@@ -38,13 +42,35 @@ const chartConfig = {
   },
 } satisfies ChartConfig
 
+interface ChartData {
+  date: Date
+  spent: number
+}
+
 export function SpendingChart() {
   const [timeRange, setTimeRange] = React.useState("90d")
+  const [chartData, setChartData] = React.useState<ChartData[]>()
+  const [isLoading, setIsLoading] = React.useState<boolean>(true)
+  const { user } = useSession()
+  const userId = user?.id
 
+  
+  const GetSpendingData = async () => {
+    const {data, error} = await fetchSpendingData(userId);
 
-  const filteredData = chartData.filter((item) => {
+    if (error){
+      console.log(error)
+      toast.error("Error fetching spending chart: " + error)
+    } else{
+      setChartData(data)
+    }
+    setIsLoading(false)
+  }
+  
+
+  const filteredData = chartData?.filter((item) => {
     const date = new Date(item.date)
-    const referenceDate = new Date("2024-06-30")
+    const referenceDate = new Date()
     let daysToSubtract = 90
     if (timeRange === "30d") {
       daysToSubtract = 30
@@ -56,7 +82,16 @@ export function SpendingChart() {
     return date >= startDate
   })
 
+  React.useEffect(() => {
+    if (userId){
+      GetSpendingData()
+    }
+  },[userId])
+
   return (
+  isLoading ? (
+    <Skeleton className="h-[350px] w-full rounded-xl" />
+  ) : (
     <Card className="border-border border">
       <CardHeader>
         <CardTitle>Spending Graph</CardTitle>
@@ -168,6 +203,8 @@ export function SpendingChart() {
       </CardContent>
     </Card>
   )
+)
+
 }
 
 export default SpendingChart;

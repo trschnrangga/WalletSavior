@@ -11,11 +11,14 @@ import {
 } from "@/components/ui/card"
 import { supabase } from '@/pages/api/supabaseClient';
 import { toast } from 'sonner';
-import React from 'react';
+import React, { useEffect } from 'react';
+import { useSession } from '@/pages/context/SessionContext'
 
 const LoginPage = () => {
   const [email, setEmail] = React.useState('');
   const [password, setPassword] = React.useState('');
+  const { user } = useSession();
+  const userId = user?.id
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -29,6 +32,10 @@ const LoginPage = () => {
       toast.success('Login successful');
     }
   }
+
+  useEffect(() => {
+    console.log(userId)
+  },[])
 
   return (
     <Card className="w-full max-w-md mx-auto mt-20 p-8 bg-card rounded-2xl text-card-foreground border-border">

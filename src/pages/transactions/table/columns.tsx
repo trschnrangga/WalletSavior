@@ -4,7 +4,7 @@ import { ColumnDef } from '@tanstack/react-table'
 import React from 'react'
 import { Button } from '@/components/ui/button'
 import { format } from 'date-fns'
-
+import { Checkbox } from "@/components/ui/checkbox"
 export type Transaction = {
     id: number
     name: string
@@ -17,6 +17,28 @@ export type Transaction = {
 
 export const columns: ColumnDef<Transaction>[] = [
 
+    {
+    id: "select",
+    header: ({ table }) => (
+      <Checkbox
+        checked={
+          table.getIsAllPageRowsSelected() ||
+          (table.getIsSomePageRowsSelected() && "indeterminate")
+        }
+        onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
+        aria-label="Select all"
+      />
+    ),
+    cell: ({ row }) => (
+      <Checkbox
+        checked={row.getIsSelected()}
+        onCheckedChange={(value) => row.toggleSelected(!!value)}
+        aria-label="Select row"
+      />
+    ),
+    enableSorting: false,
+    enableHiding: false,
+    },
     {
         accessorKey: 'name',
         header: 'Transaction Name',
