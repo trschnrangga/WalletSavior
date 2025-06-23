@@ -49,7 +49,10 @@ function DeleteConfirmCategory({categoryId, onDelete}: Props) {
             </AlertDialogHeader>
             <AlertDialogFooter>
             <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction onClick={() => {DeleteCategory(categoryId), onDelete()}}>Continue</AlertDialogAction>
+            <AlertDialogAction onClick={() => {
+                DeleteCategory(categoryId);
+                onDelete();
+              }}>Continue</AlertDialogAction>
             </AlertDialogFooter>
         </AlertDialogContent>
         </AlertDialog>
