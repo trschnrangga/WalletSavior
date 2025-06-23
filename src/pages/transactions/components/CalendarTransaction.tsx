@@ -37,7 +37,7 @@ interface CalendarTransactionProps {
   setDate: (date: Date) => void;
 }
 
-export function CalendarTransaction({date, setDate }: CalendarTransactionProps) {
+export default function CalendarTransaction({date, setDate }: CalendarTransactionProps) {
   const [open, setOpen] = React.useState(false)
   const [month, setMonth] = React.useState<Date>(date)
   const [value, setValue] = React.useState(formatDate(date))

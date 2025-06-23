@@ -7,7 +7,7 @@ import {
   CardTitle,
 } from "@/components/ui/card"
 import { useState, useEffect } from "react"
-import { useSession } from "@/pages/context/SessionContext"
+import { useSession } from "@/context/SessionContext"
 import { toast } from 'sonner'
 import fetchTopSectionData from "@/pages/api/dashboard/fetchTopSectionData"
 import { Skeleton } from "@/components/ui/skeleton"

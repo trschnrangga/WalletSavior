@@ -27,7 +27,7 @@ import {
   ToggleGroup,
   ToggleGroupItem,
 } from "@/components/ui/toggle-group"
-import { useSession } from "@/pages/context/SessionContext"
+import { useSession } from "@/context/SessionContext"
 import fetchSpendingData from "@/pages/api/dashboard/fetchSpendingData"
 import { toast } from "sonner"
 import { Skeleton } from "@/components/ui/skeleton"

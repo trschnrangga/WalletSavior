@@ -12,7 +12,7 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Button } from '@/components/ui/button'
 import { toast } from 'sonner'
-import { useSession } from '@/pages/context/SessionContext'
+import { useSession } from '@/context/SessionContext'
 import addCategories from '@/pages/api/budgeting/addCategories'
 import { Category } from '..'
 

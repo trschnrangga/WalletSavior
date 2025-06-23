@@ -7,7 +7,7 @@ import Sidebar from '@/components/GenSidebar';
 import { useRouter } from 'next/router';
 import React, { useContext, useEffect } from 'react';
 import { Toaster } from 'sonner';
-import { SessionProvider, SessionContext } from './context/SessionContext';
+import { SessionProvider, SessionContext } from '../context/SessionContext';
 
 type NextPageWithLayout = NextPage & {
   getLayout?: (page: React.ReactElement) => React.ReactNode;

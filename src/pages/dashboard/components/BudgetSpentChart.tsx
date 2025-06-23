@@ -11,7 +11,7 @@ import {
 import { Bar, BarChart, CartesianGrid, XAxis, YAxis } from "recharts"
 import fetchSpentBudgetData from '@/pages/api/dashboard/fetchSpentBudgetingData'
 import { Skeleton } from '@/components/ui/skeleton'
-import { useSession } from '@/pages/context/SessionContext'
+import { useSession } from '@/context/SessionContext'
 
 const chartConfig = {
   spent: {

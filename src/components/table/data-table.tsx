@@ -33,7 +33,7 @@ interface DataTableProps<TData, TValue> {
   resetSelectionTrigger?: any
 }
 
-export function DataTable<TData, TValue>({
+export default function DataTable<TData, TValue>({
   columns,
   data,
   globalFilter,

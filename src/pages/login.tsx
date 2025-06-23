@@ -8,7 +8,7 @@ import {
 import { supabase } from '@/pages/api/supabaseClient';
 import { toast } from 'sonner';
 import React, { useEffect } from 'react';
-import { useSession } from '@/pages/context/SessionContext'
+import { useSession } from '@/context/SessionContext'
 
 const LoginPage = () => {
   const [email, setEmail] = React.useState('');
